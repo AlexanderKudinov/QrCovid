@@ -36,8 +36,7 @@ class MainViewModel(
 
     fun back() {
         when (_scanState.value) {
-            ScanState.Error -> _scanState.value = ScanState.Error
-            ScanState.MaskScanning -> _scanState.value = ScanState.Error
+            ScanState.MaskScanning -> _scanState.value = ScanState.MaskScanning
             ScanState.QrScanning -> _scanState.value = ScanState.MaskScanning
             ScanState.FinishScanning -> _scanState.value = ScanState.QrScanning
         }
@@ -70,9 +69,25 @@ class MainViewModel(
         if (grantedAllPermissions) {
             _scanState.value = ScanState.MaskScanning
         } else {
-            _scanState.value = ScanState.Error
+            _scanState.value = ScanState.Default
             _errorState.value = ErrorState.PermissionError
         }
+    }
+
+    fun onMaskSuccess() {
+
+    }
+
+    fun onMaskFailure() {
+
+    }
+
+    fun onQrSuccess() {
+
+    }
+
+    fun onQrFailure() {
+
     }
 
 

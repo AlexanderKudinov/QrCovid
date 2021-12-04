@@ -15,7 +15,7 @@ import com.qrcovid.android.presentation.mask.MaskScanningFragment
 import com.qrcovid.android.presentation.qr.QrScanningFragment
 import kotlinx.coroutines.flow.collectLatest
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), IQrScanning, IMaskScanning {
 
     private val viewModel by viewModels<MainViewModel> {
         SavedStateViewModelFactory(application, this)
@@ -39,6 +39,8 @@ class MainActivity : AppCompatActivity() {
         todoDelete()
     }
 
+    override fun onBackPressed() {}
+
     // TODO: delete
     private fun todoDelete() {
         binding.pop.setOnClickListener {
@@ -61,10 +63,9 @@ class MainActivity : AppCompatActivity() {
     private fun observeState() {
         lifecycleScope.launchWhenResumed {
             viewModel.scanState.collectLatest { scanState ->
-                println("zzzzzz scanState = " + scanState)
                 when (scanState) {
                     ScanState.Default -> {
-                        println("Default")
+                        removeAllFragments()
                     }
                     ScanState.MaskScanning -> {
                         openMaskFragment()
@@ -74,9 +75,6 @@ class MainActivity : AppCompatActivity() {
                     }
                     ScanState.FinishScanning -> {
                         supportFragmentManager.popBackStack(BACK_STACK_QR_FRAGMENT, FragmentManager.POP_BACK_STACK_INCLUSIVE)
-                    }
-                    ScanState.Error -> {
-                        openErrorFragment()
                     }
                 }
             }
@@ -96,18 +94,18 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-//    private fun removeAllFragments() {
-//        supportFragmentManager.commit {
-//            supportFragmentManager.findFragmentByTag(TAG_MASK_FRAGMENT)?.let { fragment ->
-//                println("zzzzzz remove() " + TAG_MASK_FRAGMENT)
-//                remove(fragment)
-//            }
-//            supportFragmentManager.findFragmentByTag(TAG_QR_FRAGMENT)?.let { fragment ->
-//                println("zzzzzz remove() " + TAG_QR_FRAGMENT)
-//                remove(fragment)
-//            }
-//        }
-//    }
+    private fun removeAllFragments() {
+        supportFragmentManager.findFragmentByTag(TAG_MASK_FRAGMENT)?.let { fragment ->
+            supportFragmentManager.commit {
+                remove(fragment)
+            }
+        }
+        supportFragmentManager.findFragmentByTag(TAG_QR_FRAGMENT)?.let { fragment ->
+            supportFragmentManager.commit {
+                remove(fragment)
+            }
+        }
+    }
 
     // Could be reached on start or after qr session end
     private fun openMaskFragment() {
@@ -132,14 +130,21 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // Could be reached if any of permission wasn't granted
-    private fun openErrorFragment() {
-        if (supportFragmentManager.findFragmentByTag(TAG_ERROR_FRAGMENT) == null) {
-            supportFragmentManager.commit {
-                setReorderingAllowed(true)
-                replace<ErrorFragment>(R.id.fragmentContainer, TAG_ERROR_FRAGMENT)
-            }
-        }
+
+    override fun onMaskSuccess() {
+
+    }
+
+    override fun onMaskFailure() {
+
+    }
+
+    override fun onQrSuccess() {
+
+    }
+
+    override fun onQrFailure() {
+
     }
 
     companion object {

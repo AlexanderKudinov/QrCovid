@@ -12,6 +12,4 @@ sealed class ScanState: Parcelable {
     object QrScanning: ScanState()
     @Parcelize
     object FinishScanning: ScanState()
-    @Parcelize
-    object Error: ScanState()
 }
