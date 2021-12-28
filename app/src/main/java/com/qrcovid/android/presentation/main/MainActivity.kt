@@ -1,17 +1,17 @@
 package com.qrcovid.android.presentation.main
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.*
 import androidx.lifecycle.SavedStateViewModelFactory
 import androidx.lifecycle.lifecycleScope
 import com.qrcovid.android.R
 import com.qrcovid.android.databinding.ActivityMainBinding
-import com.qrcovid.android.presentation.error.ErrorFragment
-import com.qrcovid.android.presentation.mask.MaskScanningFragment
+import com.qrcovid.android.presentation.mask.CameraFragment
 import com.qrcovid.android.presentation.qr.QrScanningFragment
 import kotlinx.coroutines.flow.collectLatest
 
@@ -36,6 +36,7 @@ class MainActivity : AppCompatActivity(), IQrScanning, IMaskScanning {
         observeState()
         permissionsCallback.launch(arrayOf(CAMERA_PERMISSION))
 
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         todoDelete()
     }
 
@@ -112,7 +113,7 @@ class MainActivity : AppCompatActivity(), IQrScanning, IMaskScanning {
         if (supportFragmentManager.findFragmentByTag(TAG_MASK_FRAGMENT) == null) {
             supportFragmentManager.commit {
                 setReorderingAllowed(true)
-                add<MaskScanningFragment>(R.id.fragmentContainer, TAG_MASK_FRAGMENT)
+                add<CameraFragment>(R.id.fragmentContainer, TAG_MASK_FRAGMENT)
             }
         } else if (supportFragmentManager.findFragmentByTag(TAG_QR_FRAGMENT) != null) {
             supportFragmentManager.popBackStack(BACK_STACK_QR_FRAGMENT, FragmentManager.POP_BACK_STACK_INCLUSIVE)
